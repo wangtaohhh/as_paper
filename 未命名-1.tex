@@ -26,7 +26,7 @@
 \section{马尔科夫状态模型的构建过程}
 	\subsection{K-Medoids聚类}
 
-K-Medoids算法在K-means算法的基础上衍生而来，K-Means聚类算法的目的是将分子动力学（MD）数据集划分为K个不重叠的聚类$\{C_{1},C_{2}, \cdots,  C_{k}\}$，使不同的状态与相应聚类中心（几何平均值）的距离平方和最小化。其算法可以表示为
+K-Medoids算法在K-means算法的基础上衍生而来，K-Means聚类算法的目的是将分子动力学（MD）轨迹数据集划分为K个不重叠的聚类$\{C_{1},C_{2}, \cdots,  C_{k}\}$，使不同的状态与相应聚类中心（几何平均值）的距离平方和最小化。其算法可以表示为
 
 \begin{equation}
 min\sum_{i=1}^{K}\sum_{x\in C_{i}}^{} {\vert\vert x- \mu_{i} \vert\vert}^{2}
@@ -44,6 +44,7 @@ min\sum_{i=1}^{K}\sum_{x\in C_{i}}^{} {\vert\vert x- \mathrm C(C_{i}) \vert\vert
 
 其中，$\mathrm C(C_{i})$是作为聚类中心的构象，而非均值。
 
+通过以上算法，我们可以将MD轨迹数据划分为一个一个的“微状态”，供后续马尔科夫模型构建使用。
 
 	\subsection{计算转移矩阵}
 	\subsection{构建马尔科夫状态模型}
