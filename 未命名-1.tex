@@ -1,10 +1,13 @@
 \documentclass[a4paper]{article}
-\title{马尔可夫状态模型协助发现靶点的隐藏口袋}                   %———总标题
+\title{利用马尔可夫状态模型分析分子动力学模拟轨迹}                   %———总标题
    \author{王韬 2024221120}
+	\date{2025 年 1 月 8 日}
+\usepackage{subfigure}
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{ctex}
 \usepackage{CJKutf8}
+
 \renewcommand{\abstractname}{\textbf{\zihao{4}摘要}}
 \begin{document}
 	
@@ -16,15 +19,32 @@
 \tableofcontents
 \end{center}
 
+\newpage
+
  \begin{abstract}
 
-基于结构的药物设计（SBDD）需要预先了解特定靶点的药物结合位置，结构生物学研究中对复合物结构的解析也确实可以提供药物结合口袋的具体位置。然而，现实中的蛋白质不断运动，在运动的过程中很可能产生结构解析中无法发现的隐藏口袋。遗憾的是，大多数隐藏的口袋位点只有在解析到一个小分子可以稳定结合时才会被发现。通过课程的学习，我提出了一种方法，不使用结构生物学的方法发现隐藏的药物结合位点口袋，而是利用马尔可夫状态模型，通过马尔可夫状态间接揭示隐藏口袋。这种方法弥补了高通量筛选或者结构生物学“高成本，长周期”的缺点，为药物设计提供一种计算手段。
+分子动力学模拟需要消耗较多的计算资源。在科学研究中，为了缩减计算所需要的时间，研究人员会使用多个计算机进行并行计算来代替在单个计算机上进行长时间计算。遗憾的是，并行计算所生成的轨迹并不能直接拼合成一条单独的长时间轨迹。面对这一困境，马尔可夫状态模型得到了广泛的应用。对于多个并行计算结果，可以提取构象的特征，并构建转移矩阵，从而解释长时间尺度的分子运动过程。丙氨酸二肽是很有代表性的小分子，它的二面角构象十分丰富，同时分子结构简单，适合用来研究分子动力学的运动过程。对丙氨酸二肽的模拟揭示了马尔可夫状态模型的可行性，这种方法可以推广到更复杂的蛋白之上，用以研究复杂蛋白的运动过程。
 
  \end{abstract}
+
 \newpage
 
 
-\section{构建马尔可夫状态模型}
+\section{介绍}
+	\subsection{丙氨酸二肽}
+
+	分子动力学研究中的丙氨酸二肽并不是简单的将两个丙氨酸残基以肽键连接起来，而是使用乙酰基和甲胺基封端，这样就排除了电荷影响。这是一个常用来研究蛋白质中氨基酸的构象行为的典型模型分子，其结构如下图所示。
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.35]{ala_di.jpg}
+\caption{丙氨酸二肽的结构}
+\end{figure}
+
+	从图中可以看出，丙氨酸二肽运动的最直接变化值就是二面角，后续也将以此为主要参照进行研究。
+
+
+	
 	\subsection{K-Medoids聚类}
 
 K-Medoids算法在K-means算法的基础上衍生而来，K-Means聚类算法的目的是将分子动力学（MD）数据集划分为K个不重叠的聚类$\{C_{1},C_{2}, \cdots,  C_{k}\}$，使不同的状态与相应聚类中心（几何平均值）的距离平方和最小化。其算法可以表示为
@@ -47,11 +67,11 @@ min\sum_{i=1}^{K}\sum_{x\in C_{i}}^{} {\vert\vert x- \mathrm C(C_{i}) \vert\vert
 
 
 	\subsection{计算转移矩阵}
-计算得到转移矩阵是构建马尔可夫过程十分重要的一个步骤，图1展示了对分子动力学轨迹构建转移矩阵的示意图。
+计算得到转移矩阵是构建马尔可夫过程十分重要的一个步骤，下图为分子动力学轨迹构建转移矩阵的示意图。
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.35]{trans_matrix.png}
+\includegraphics[scale=0.48]{trans_matrix.png}
 \caption{转移矩阵示意图}
 \end{figure}
 
@@ -66,26 +86,69 @@ min\sum_{i=1}^{K}\sum_{x\in C_{i}}^{} {\vert\vert x- \mathrm C(C_{i}) \vert\vert
 t_{i} = -\frac{\tau}{log(\lambda_{i})}
 \end{equation}
 
-其中$\lambda_{i}$为特征值， $\tau$为采样一次的时间
+其中$\lambda_{i}$为特征值， $\tau$为采样一次的时间。
 
 
 
 
 
-\section{查找隐藏口袋}
-	\subsection{}
+\section{结果}
+	\subsection{丙氨酸二肽有6个自由能高值}
+		已有的研究手动选择了六种状态，在这些状态下分子的能量较大，我使用该报道中的结果与模拟结果进行对比，证明了模拟的正确性，在我的模拟中，丙氨酸二肽运动轨迹的自由能景观图与已有报道相一致。这说明我的模拟结果是正确的，可以用于接下来的研究。
+
+\begin{figure}[H]
+\centering  
+\subfigure[先验景观]{
+\label{Fig.sub.1}
+\includegraphics[width=0.35\textwidth]{tr_force.png}}
+\subfigure[模拟景观]{
+\label{Fig.sub.2}
+\includegraphics[width=0.65\textwidth]{free_energy.png}}
+\caption{能量景观对比}
+\label{Fig.main}
+\end{figure}
+
+
+
+
+	
+
+	\subsection{马尔可夫模型可以用来描述丙氨酸二肽的运动}
+
+	首先对分子动力学模拟轨迹进行聚类，使用聚类结果构建转移矩阵，聚类结果如下图所示。
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.75]{clus.png}
+\caption{聚类结果}
+\end{figure}
+
+	随后计算马尔可夫模型的隐含时间尺度，这是Chapman-Kolmogorov检验的简化版本。在这里我比较了不同数量的聚类中心对时间的影响，结果显示在多个数量的聚类中心下模型都能趋于稳定，且一些关键慢速构象达到平衡的时间十分接近，证明构建的马尔科夫模型可以用于进一步的研究。
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.55]{impied.png}
+\caption{聚类结果}
+\end{figure}
+
+
+	\subsection{丙氨酸二肽有4个具有代表性的构象}
+
+
+
 
 
 \section{实验方法}
 	\subsection{分子动力学模拟}
 
-该研究选取了$\beta$-内酰胺酶（PDB: 1jwp）作为研究对象，选取该蛋白的原因在于它有一个已知的隐藏位点，这个位点在晶体结构中是不可见的.因此可以用来验证方法的可行性。使用gromacs2021进行分子动力学模拟计算，力场为Amber03，在300K温度下模拟300ns，其中水模型为TIP3P，为了平衡电荷，在体系中加入了7个$Na^{+}$离子
+该研究选取了丙氨酸二肽作为研究对象，选取该分子的原因在于它的结构十分简单，同时该分子已经被充分研究，具有正确的先验知识。在本研究中使用gromacs2021进行分子动力学模拟计算，力场为Amber03，在300K温度下模拟250ns，其中水模型为TIP3P。
 
 	\subsection{马尔可夫模型构建}
-构建马尔可夫模型使用了MSMBuilder，使用报道过的方法，首先对 $C_{\alpha} $和 $C_{\beta}$原子进行了均方根误差（RMSD）计算 ，随后使用 K-Medoids算法以RMSD为根据对每10 个构象进行聚类。这种方法把极其庞大的轨迹数据缩减到了原来的十分之一大小，而剩余的轨迹则被分配给这些聚类中心
+构建马尔可夫模型使用了MSMBuilder，使用报道过的方法，首先对进行了均方根误差（RMSD）计算 ，确认体系达到平衡；随后使用 K-Medoids算法以RMSD为根据对每10个构象进行聚类。这种方法把极其庞大的轨迹数据缩减到了原来的十分之一大小，而剩余的轨迹则被分配给这些聚类中心。
 
 
-为了发现隐藏口袋的开放行为，使用 Python 包 MDTraj 中实现的 Shrake–Rupley 算法计算溶剂可及表面积。对于所有蛋白质和复合物，使用 0.28 nm 的溶剂探针半径
+\section{讨论}
+
 
 
 \end{CJK}
